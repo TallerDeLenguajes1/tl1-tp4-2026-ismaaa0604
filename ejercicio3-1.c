@@ -1,70 +1,93 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
-struct Producto {
- int ProductoID; //Numerado en ciclo iterativo
- int Cantidad; // entre 1 y 10
- char *TipoProducto; // Algún valor del arreglo TiposProductos
- float PrecioUnitario; // entre 10 - 100
-};
-struct Cliente {
-    int ClienteID; // Numerado en el ciclo iterativo
-    char *NombreCliente; // Ingresado por usuario
-    int CantidadProductosAPedir; // (aleatorio entre 1 y 5)
-    struct Producto *Productos; //El tamaño de este arreglo depende de la variable
-    // “CantidadProductosAPedir”
-};
-float costoTotal(struct Producto prod);
+#include<string.h>
+typedef struct Tarea{
+    int TareaID;//Numérico autoincremental comenzando en 1000
+    char *Descripcion; //
+    int Duracion; // entre 10 – 100
+}Tarea;
+typedef struct Nodo{
+    Tarea T;
+    struct Nodo *Siguiente;
+}Nodo;
+Nodo * CrearListaVacia();
+Nodo * CrearTarea(int id, char descripcion[50]);
+void InsertarNodo(Nodo ** Start , Nodo *Nodos);
+Nodo * QuitarNodo(Nodo **Start, int id);
 int main(){
-    int cantidadDeseada;
-    char nombre[100];
-    char *TiposProductos[]={"Galletas","Snack","Cigarrillos","Caramelos","Bebidas"};
     srand(time(NULL));
-    printf("¿que cantidad de nombres vas a usar?: \n");
-    scanf("%d", &cantidadDeseada);
-    struct Cliente * cliente = malloc(sizeof(struct Cliente)* cantidadDeseada);
-    for (int i = 0; i< cantidadDeseada; i++){
-        cliente[i].ClienteID = i;
-        printf("Ingrese el nombre: \n");
-        fgets(nombre, sizeof(nombre), stdin);
-        nombre[strcspn(nombre, "\n")] = '\0';
-        int cantidadDeCaracteres = strlen(nombre) + 1;
-        cliente[i].NombreCliente = (char *)malloc(sizeof(char) * (cantidadDeCaracteres+1));
-        strcpy(cliente[i].NombreCliente,nombre);
-        cliente[i].CantidadProductosAPedir = 1 + rand()%(5-1+1);
-        cliente[i].Productos = malloc(sizeof(struct Producto)* cliente[i].CantidadProductosAPedir);
-        for(int j=0; j<cliente[i].CantidadProductosAPedir; j++){
-            int aleatorio = rand()%5;
-           cliente[i].Productos[j].ProductoID = j;
-           cliente[i].Productos[j].Cantidad = 1+ rand()%(10-1+1);
-           cliente[i].Productos[j].PrecioUnitario = 10 + rand()%(100-10+1);
-           cliente[i].Productos[j].TipoProducto = TiposProductos[aleatorio];
-           float costoT = costoTotal(cliente[i].Productos[j]);
-           //printf("El costo total de este producto es: %f \n", costoT); 
-        }
+    Nodo *Start;
+    Nodo *Start1;
+    int bandera = 1;
+    int ID = 1000, id;
+    char descripc[50];
+    Start = CrearListaVacia();
+    Start = CrearListaVacia();
+    while(bandera == 1){
+        fflush(stdin);
+        printf("Agregue la descripcion de la tarea: \n");
+
+        fgets(descripc, 50, stdin);
+        descripc[strcspn(descripc, "\n")] = '\0';
+        InsertarNodo(&Start ,CrearTarea(ID,descripc));
+        ID++;
+        printf("Quiere seguir agregando tareas(1) o finalizar la carga(0)? \n");
+        scanf("%d", &bandera);
     }
-    for (int i = 0; i < cantidadDeseada; i++){
-        float totalApagar = 0;
-        printf("El ID del cliente es: %d \n", cliente[i].ClienteID);
-        printf("El nombre del cliente es: %s \n",cliente[i].NombreCliente);
-        printf("La cantidad de productos a pedir por este cliente es: %d \n", cliente[i].CantidadProductosAPedir);
-        for(int j=0; j<cliente[i].CantidadProductosAPedir; j++){
-           printf("El ID del producto del ciente %d es: %d \n",i,cliente[i].Productos[j].ProductoID);
-           printf("La cantidad de este producto es: %d \n",cliente[i].Productos[j].Cantidad);
-           printf("El precio unitario de este procuto es: %f \n",cliente[i].Productos[j].PrecioUnitario);
-           printf("El tipo del producto es: %s \n",cliente[i].Productos[j].TipoProducto);
-           float costoT = costoTotal(cliente[i].Productos[j]);
-           totalApagar = totalApagar + costoT; 
-        }
-        printf("El costo total a pagar del cliente %d es: %f \n",i,totalApagar);
+    bandera = 1;
+    while(bandera==1){
+        printf("Introduzca el Id de la traea que quiere marcar como realizada: \n");
+        scanf("%d",id);
+        Nodo *pendiente = QuitarNodo(&Start, id); //retorno del nodo que esta libre, 
+        InsertarNodo(&Start1, pendiente);
+        printf("Quiere seguir agregando tareas(1) o finalizar la carga(0)? \n");
+        scanf("%d", &bandera);
     }
-    for (int i = 0; i < cantidadDeseada; i++) {
-        free(cliente[i].NombreCliente); // Liberamos la memoria del nombre
-        free(cliente[i].Productos);     // Liberamos los productos de este cliente
-    }
-    free(cliente);
     return 0;
 }
-float costoTotal(struct Producto prod){
-    return prod.PrecioUnitario * (float)prod.Cantidad;
+Nodo * CrearListaVacia()
+{
+    return NULL;
+}
+Nodo * CrearTarea(int id, char descripcion[50]){
+    Nodo * tarea = (Nodo *)malloc(sizeof(Nodo));
+    tarea->T.TareaID = id;
+    int cantidadDeCaracteres = strlen(descripcion);
+    tarea->T.Descripcion = (char *)malloc(sizeof(char)*(cantidadDeCaracteres+1));
+    strcpy(tarea->T.Descripcion,descripcion);
+    tarea->T.Duracion = 10 + rand()%(100-10+1);
+    tarea->Siguiente = NULL;
+    return tarea;
+}
+void InsertarNodo(Nodo ** Start , Nodo *Nodos)
+{
+    Nodos->Siguiente = *Start;
+    *Start = Nodos ;
+}
+Nodo * buscarNodo(Nodo * Start, int IdBuscado){
+    Nodo * Aux = Start;
+    while(Aux && Aux->T.TareaID != IdBuscado)
+    {
+    Aux = Aux->Siguiente;
+    }
+    return Aux;
+}
+Nodo * QuitarNodo(Nodo **Start, int id){
+    Nodo *nodoAux = (*Start);
+    Nodo *nodoAnt = NULL;
+    while (nodoAux != NULL && nodoAux->T.TareaID != id){
+        nodoAnt = nodoAux;
+        nodoAux = nodoAux->Siguiente;
+    }
+    if (nodoAux != NULL){
+        if (nodoAux == (*Start)){
+            (*Start) = nodoAux->Siguiente;
+        }
+        else{
+            nodoAnt->Siguiente = nodoAux->Siguiente;
+        }
+        nodoAux->Siguiente = NULL;
+    }
+    return (nodoAux);
 }
