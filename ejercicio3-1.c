@@ -16,6 +16,7 @@ Nodo * CrearTarea(int id, char descripcion[50]);
 void InsertarNodo(Nodo ** Start , Nodo *Nodos);
 Nodo * QuitarNodo(Nodo **Start, int id);
 void Mostrar(Nodo * Start);
+void buscar(Nodo * Start, Nodo * Start1);
 int main(){
     srand(time(NULL));
     Nodo *Start;
@@ -49,6 +50,7 @@ int main(){
     }
     printf("----Lista de tareas realizadas: -------\n\n");
     Mostrar(Start1);
+    buscar(Start,Start1);
     return 0;
 }
 void Mostrar(Nodo * Start){
@@ -57,7 +59,7 @@ void Mostrar(Nodo * Start){
         printf("El Id de la tarea es: %d \n",aux->T.TareaID);
         printf("La descripcion de esta tarea es: %s \n",aux->T.Descripcion);
         printf("La duracion de esta tarea es: %d \n",aux->T.Duracion);
-        print("\n\n");
+        printf("\n\n");
         aux = aux->Siguiente;
     }
 }
@@ -80,15 +82,71 @@ void InsertarNodo(Nodo ** Start , Nodo *Nodos)
     Nodos->Siguiente = *Start;
     *Start = Nodos ;
 }
-Nodo * buscarNodo(Nodo * Start, int IdBuscado){
-    Nodo * Aux = Start;
-    while(Aux && Aux->T.TareaID != IdBuscado)
-    {
-        Aux = Aux->Siguiente;
+void buscar(Nodo * Start, Nodo * Start1){
+    int opcion, id;
+    char descrip[50];
+    printf("Quiere consultar una tarea por id(inserte 1) o quiere consultarla por palabra clave(inserte 0): \n");
+    scanf("%d", &opcion);
+    if(opcion == 1){
+        scanf("%d", &id);
+        Nodo *aux = Start;
+        while(aux != NULL){
+            if(id == aux->T.TareaID){
+                printf("El Id de la tarea es: %d \n",aux->T.TareaID);
+                printf("La descripcion de esta tarea es: %s \n",aux->T.Descripcion);
+                printf("La duracion de esta tarea es: %d \n",aux->T.Duracion);
+                printf("Se trata de una tarea pendiente \n");
+                printf("\n\n");
+            }
+            aux = aux->Siguiente;
+        }
+        Nodo *aux1 = Start1;
+        while(aux1 != NULL){
+            if(id == aux1->T.TareaID){
+                printf("El Id de la tarea es: %d \n",aux1->T.TareaID);
+                printf("La descripcion de esta tarea es: %s \n",aux1->T.Descripcion);
+                printf("La duracion de esta tarea es: %d \n",aux1->T.Duracion);
+                printf("Se trata de una tarea realizada \n");
+                printf("\n\n");
+            }
+            aux1 = aux1->Siguiente;
+        }
     }
-    return Aux;
+    else{
+        printf("Ingrese la palabra: \n");
+        fflush(stdin);
+        fgets(descrip,50,stdin);
+        descrip[strcspn(descrip,"\n")]='\0';
+        Nodo *aux = Start;
+        while(aux != NULL){
+            if (strstr(aux->T.Descripcion, descrip) != NULL) {
+                printf("El Id de la tarea es: %d \n",aux->T.TareaID);
+                printf("La descripcion de esta tarea es: %s \n",aux->T.Descripcion);
+                printf("La duracion de esta tarea es: %d \n",aux->T.Duracion);
+                printf("Se trata de una tarea pendiente \n");
+                printf("\n\n");
+            }
+            aux = aux->Siguiente;
+        }
+        Nodo *aux1 = Start1;
+        while(aux1 != NULL){
+            if (strstr(aux1->T.Descripcion, descrip) != NULL) {
+                printf("El Id de la tarea es: %d \n",aux1->T.TareaID);
+                printf("La descripcion de esta tarea es: %s \n",aux1->T.Descripcion);
+                printf("La duracion de esta tarea es: %d \n",aux1->T.Duracion);
+                printf("Se trata de una tarea realizada \n");
+                printf("\n\n");
+            }
+            aux1 = aux1->Siguiente;
+        }
+    }
+
 }
-Nodo * QuitarNodo(Nodo **Start, int id){
+Nodo * QuitarNodo(Nodo **Start, int id){/*Cuando pasas un puntero simple (Tnodo *Start) a una función, C crea una copia de ese puntero. 
+Si dentro de la función haces Start = NULL, solo cambias la copia; el puntero original en tu main seguirá apuntando a la lista vieja.
+Al usar Tnodo **Start (un puntero a un puntero), le estás pasando a la función la dirección de memoria donde guardas el inicio de la lista. 
+Esto permite que la función sobrescriba el valor original.*/
+
     Nodo *nodoAux = (*Start); //(*Start): Porque (*Start) contiene la dirección de memoria del primerísimo nodo de la lista. 
     //Al igualarlos, estás colocando a tu explorador en la casilla de salida, listo para empezar a caminar
     Nodo *nodoAnt = NULL; //el nodo anterior apunta al nulo
