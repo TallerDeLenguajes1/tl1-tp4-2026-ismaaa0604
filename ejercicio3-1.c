@@ -17,6 +17,7 @@ void InsertarNodo(Nodo ** Start , Nodo *Nodos);
 Nodo * QuitarNodo(Nodo **Start, int id);
 void Mostrar(Nodo * Start);
 void buscar(Nodo * Start, Nodo * Start1);
+void limpiarBuffer();
 int main(){
     srand(time(NULL));
     Nodo *Start;
@@ -27,15 +28,13 @@ int main(){
     Start = CrearListaVacia();
     Start1 = CrearListaVacia();
     while(bandera == 1){
-        fflush(stdin);
         printf("Agregue la descripcion de la tarea: \n");
-
         fgets(descripc, 50, stdin);
-        descripc[strcspn(descripc, "\n")] = '\0';
         InsertarNodo(&Start ,CrearTarea(ID,descripc));
         ID++;
         printf("Quiere seguir agregando tareas(1) o finalizar la carga(0)? \n");
         scanf("%d", &bandera);
+        limpiarBuffer();
     }
     printf("----Lista de tareas pendientes: -------\n\n");
     Mostrar(Start);
@@ -87,6 +86,7 @@ void buscar(Nodo * Start, Nodo * Start1){
     char descrip[50];
     printf("Quiere consultar una tarea por id(inserte 1) o quiere consultarla por palabra clave(inserte 0): \n");
     scanf("%d", &opcion);
+    limpiarBuffer();
     if(opcion == 1){
         scanf("%d", &id);
         Nodo *aux = Start;
@@ -114,7 +114,6 @@ void buscar(Nodo * Start, Nodo * Start1){
     }
     else{
         printf("Ingrese la palabra: \n");
-        fflush(stdin);
         fgets(descrip,50,stdin);
         descrip[strcspn(descrip,"\n")]='\0';
         Nodo *aux = Start;
@@ -164,4 +163,8 @@ Esto permite que la función sobrescriba el valor original.*/
         nodoAux->Siguiente = NULL; //hacemos que el nodo apunte al nulo para evitar traer lo que seguia despues de el
     }
     return (nodoAux);
+}
+void limpiarBuffer(){
+    int c;
+    while((c = getchar()) != '\n' && c != EOF){}
 }
